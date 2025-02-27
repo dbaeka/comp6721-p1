@@ -2,8 +2,8 @@ import warnings
 
 import numpy as np
 
-from utils.evaluation import evaluate_model, compare_models
 from utils.dataset_loader import load_and_preprocess_images
+from utils.evaluation import evaluate_model, compare_models
 from utils.model_inference import load_model, load_feature_scaler
 
 warnings.filterwarnings('ignore')
@@ -20,14 +20,10 @@ if __name__ == "__main__":
     print("=== Indoor vs Outdoor Image Classification Testing ===\n")
     print("Step 1: Loading and preprocessing images...")
 
-    import os
-
-    os.makedirs('models', exist_ok=True)
-
     # 1. Load the models
-    dt_model, _ = load_model("Decision Tree")
-    rf_model, _ = load_model("Random Forest")
-    gb_model = load_model("Gradient Boosting")
+    dt_model = load_model("Decision Tree")
+    # rf_model, _ = load_model("Random Forest")
+    # gb_model = load_model("Gradient Boosting")
 
     # Load the feature scaler
     feature_scaler = load_feature_scaler()
