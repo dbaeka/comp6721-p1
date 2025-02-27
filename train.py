@@ -2,8 +2,6 @@ import os
 import sys
 import warnings
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -15,6 +13,8 @@ from utils.model_inference import save_models, save_feature_transform
 from utils.model_training import train_decision_tree, train_gradient_boosting, train_random_forest
 
 warnings.filterwarnings('ignore')
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Set random seed for reproducibility
 np.random.seed(42)

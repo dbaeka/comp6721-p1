@@ -2,8 +2,6 @@ import os
 import sys
 import warnings
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 import numpy as np
 
 from utils.dataset_loader import load_and_preprocess_images
@@ -11,6 +9,8 @@ from utils.evaluation import evaluate_model, compare_models
 from utils.model_inference import load_model, load_feature_transform
 
 warnings.filterwarnings('ignore')
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Set random seed for reproducibility
 np.random.seed(42)
