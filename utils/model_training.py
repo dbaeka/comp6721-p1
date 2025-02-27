@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -5,11 +7,14 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 
-def train_decision_tree(X_train, y_train, X_test):
+def train_decision_tree(X_train, y_train, X_test, save_plots=False, output_dir=None):
     """
     Train and optimize a decision tree classifier
     """
     print("\n=== Decision Tree Classifier ===")
+
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Define parameter grid for hyperparameter tuning
     param_dist = {
@@ -46,16 +51,24 @@ def train_decision_tree(X_train, y_train, X_test):
     plt.figure(figsize=(20, 10))
     plot_tree(best_model, max_depth=3, filled=True, feature_names=None, class_names=['Indoor', 'Outdoor'])
     plt.title('Decision Tree Visualization (Limited to Depth 3)')
-    plt.show()
+
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, 'decision_tree.png'))
+        plt.close()
+    else:
+        plt.show()
 
     return best_model, y_pred
 
 
-def train_random_forest(X_train, y_train, X_test):
+def train_random_forest(X_train, y_train, X_test, save_plots=False, output_dir=None):
     """
     Train and optimize a random forest classifier
     """
     print("\n=== Random Forest Classifier ===")
+
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Define parameter grid for hyperparameter tuning
     param_dist = {
@@ -97,16 +110,23 @@ def train_random_forest(X_train, y_train, X_test):
     plt.yticks(range(len(indices)), [f'Feature {i}' for i in indices])
     plt.xlabel('Relative Importance')
     plt.tight_layout()
-    plt.show()
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, 'random_forest_feature_importance.png'))
+        plt.close()
+    else:
+        plt.show()
 
     return best_model, y_pred
 
 
-def train_gradient_boosting(X_train, y_train, X_test):
+def train_gradient_boosting(X_train, y_train, X_test, save_plots=False, output_dir=None):
     """
     Train and optimize a gradient boosting classifier
     """
     print("\n=== Gradient Boosting Classifier ===")
+
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Define parameter grid for hyperparameter tuning
     param_dist = {
@@ -137,5 +157,21 @@ def train_gradient_boosting(X_train, y_train, X_test):
 
     # Evaluate on test set
     y_pred = best_model.predict(X_test)
+
+    # Feature importance
+    feature_importance = best_model.feature_importances_
+    indices = np.argsort(feature_importance)[-20:]  # Top 20 features
+
+    plt.figure(figsize=(10, 8))
+    plt.title('Gradient Boosting Feature Importance')
+    plt.barh(range(len(indices)), feature_importance[indices], align='center')
+    plt.yticks(range(len(indices)), [f'Feature {i}' for i in indices])
+    plt.xlabel('Relative Importance')
+    plt.tight_layout()
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, 'gradient_boosting_feature_importance.png'))
+        plt.close()
+    else:
+        plt.show()
 
     return best_model, y_pred

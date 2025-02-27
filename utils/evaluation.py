@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -7,7 +9,7 @@ from sklearn.metrics import (accuracy_score, recall_score, precision_score,
                              roc_curve, auc, precision_recall_curve)
 
 
-def evaluate_model(model, X_test, y_test, y_pred, model_name):
+def evaluate_model(model, X_test, y_test, y_pred, model_name, save_plots=False, output_dir=None):
     """
     Evaluate model performance with multiple metrics
     """
@@ -16,6 +18,9 @@ def evaluate_model(model, X_test, y_test, y_pred, model_name):
     precision = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
+
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Print metrics
     print(f"\n--- {model_name} Evaluation Metrics ---")
@@ -34,7 +39,12 @@ def evaluate_model(model, X_test, y_test, y_pred, model_name):
     plt.xticks([0.5, 1.5], ['Indoor', 'Outdoor'])
     plt.yticks([0.5, 1.5], ['Indoor', 'Outdoor'])
     plt.tight_layout()
-    plt.show()
+
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, f'{model_name}_confusion_matrix.png'))
+        plt.close()
+    else:
+        plt.show()
 
     # Classification Report
     print("\nClassification Report:")
@@ -56,7 +66,11 @@ def evaluate_model(model, X_test, y_test, y_pred, model_name):
             plt.ylabel('True Positive Rate')
             plt.title(f'{model_name} ROC Curve')
             plt.legend(loc="lower right")
-            plt.show()
+
+            if save_plots:
+                plt.savefig(os.path.join(output_dir, f'{model_name}_roc_curve.png'))
+            else:
+                plt.show()
 
             # Precision-Recall Curve
             precision_curve, recall_curve, _ = precision_recall_curve(y_test, y_prob)
@@ -67,7 +81,12 @@ def evaluate_model(model, X_test, y_test, y_pred, model_name):
             plt.title(f'{model_name} Precision-Recall Curve')
             plt.xlim([0.0, 1.0])
             plt.ylim([0.0, 1.05])
-            plt.show()
+
+            if save_plots:
+                plt.savefig(os.path.join(output_dir, f'{model_name}_precision_recall_curve.png'))
+                plt.close()
+            else:
+                plt.show()
         except:
             print("Could not generate probability-based plots")
 
@@ -80,7 +99,7 @@ def evaluate_model(model, X_test, y_test, y_pred, model_name):
     }
 
 
-def compare_models(results):
+def compare_models(results, save_plots=False, output_dir=None):
     """
     Compare performance of different models
     """
@@ -90,6 +109,9 @@ def compare_models(results):
     precision = [result['precision'] for result in results]
     recall = [result['recall'] for result in results]
     f1 = [result['f1'] for result in results]
+
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     # Bar chart comparing metrics
     metrics_df = pd.DataFrame({
@@ -108,7 +130,12 @@ def compare_models(results):
     plt.ylim([0, 1])
     plt.legend(loc='lower right')
     plt.tight_layout()
-    plt.show()
+
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, 'model_comparison.png'))
+        plt.close()
+    else:
+        plt.show()
 
     # Create a summary table
     print("\n=== Model Performance Summary ===")

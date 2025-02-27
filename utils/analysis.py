@@ -29,7 +29,7 @@ def create_correlation_heatmap(selected_df):
     return fig
 
 
-def explore_data(X, y, feature_names=None, n_jobs=None, save_plots=False, output_dir=None):
+def explore_data(X, y, feature_names=None, save_plots=False, output_dir=None):
     """
     Perform exploratory data analysis on extracted features with parallel processing
 
@@ -48,10 +48,6 @@ def explore_data(X, y, feature_names=None, n_jobs=None, save_plots=False, output
     output_dir : str, optional
         Directory to save plots if save_plots is True
     """
-    if n_jobs is None:
-        # Use available CPU cores, but leave one for system operations
-        n_jobs = max(os.cpu_count() - 1, 1)
-
     if feature_names is None:
         # Create generic feature names if not provided
         feature_names = [f'feature_{i}' for i in range(X.shape[1])]

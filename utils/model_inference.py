@@ -3,11 +3,13 @@ import os
 import joblib
 
 
-def save_feature_scaler(scaler):
-    os.makedirs('models', exist_ok=True)
+def save_feature_transform(transform, name):
+    os.makedirs('feature_transforms', exist_ok=True)
 
-    joblib.dump(scaler, 'models/feature_scaler.joblib')
-    print("Feature scaler successfully saved to the 'models' directory")
+    snake_name = name.replace(" ", "_").lower()
+    joblib.dump(transform, f'feature_transforms/{snake_name}.joblib')
+
+    print("Transform successfully saved to the 'feature_transforms' directory")
 
 
 def save_models(model, name):
@@ -26,5 +28,8 @@ def load_model(model_name):
     return model
 
 
-def load_feature_scaler():
-    return joblib.load('models/feature_scaler.joblib')
+def load_feature_transform(transform_name):
+    snake_name = transform_name.replace(" ", "_").lower()
+    transform = joblib.load(f'feature_transforms/{snake_name}.joblib')
+
+    return transform

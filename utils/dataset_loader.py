@@ -18,6 +18,7 @@ def extract_features(img_array):
     # 1. Color histograms (RGB)
     for i in range(3):
         channel_hist, _ = np.histogram(img_array[:, :, i], bins=32, range=(0, 256))
+        channel_hist = channel_hist / np.sum(channel_hist)  # Normalize histogram
         features.extend(channel_hist)
 
     # 2. Convert to grayscale for HOG features
@@ -31,6 +32,7 @@ def extract_features(img_array):
     # 4. Local Binary Patterns (Texture)
     lbp = local_binary_pattern(gray_img, P=8, R=1, method='uniform')
     lbp_hist, _ = np.histogram(lbp, bins=10, range=(0, 10))
+    lbp_hist = lbp_hist / np.sum(lbp_hist)  # Normalize LBP histogram
     features.extend(lbp_hist)
 
     # 5. Basic statistics (brightness, contrast)
@@ -51,6 +53,7 @@ def process_image(img_file, class_dir, target_size, label):
         img = Image.open(img_path)
         img = img.resize(target_size)
         img = img.convert('RGB')
+
         img_array = np.array(img)
 
         # Extract features
@@ -77,39 +80,35 @@ def load_and_preprocess_images(data_dir, target_size=(128, 128), max_images=None
     label_map = {'indoor': 0, 'outdoor': 1}
 
     # Configure a process pool for parallel processing
-    pool = mp.Pool(processes=n_jobs)
+    with mp.Pool(processes=n_jobs) as pool:
+        for class_name in classes:
+            if class_name not in label_map:
+                continue
 
-    for class_name in classes:
-        if class_name not in label_map:
-            continue
+            class_dir = os.path.join(data_dir, class_name)
+            label = label_map[class_name]
+            image_files = os.listdir(class_dir)
 
-        class_dir = os.path.join(data_dir, class_name)
-        label = label_map[class_name]
-        image_files = os.listdir(class_dir)
+            if max_images and len(image_files) > max_images:
+                image_files = np.random.choice(image_files, max_images, replace=False)
 
-        if max_images and len(image_files) > max_images:
-            image_files = np.random.choice(image_files, max_images, replace=False)
+            print(f"\nProcessing {len(image_files)} {class_name} images using {n_jobs} processes...")
 
-        print(f"\nProcessing {len(image_files)} {class_name} images using {n_jobs} processes...")
+            # Create a partial function with fixed parameters
+            process_func = partial(process_image, class_dir=class_dir, target_size=target_size, label=label)
 
-        # Create a partial function with fixed parameters
-        process_func = partial(process_image, class_dir=class_dir, target_size=target_size, label=label)
+            # Map the function to all images in parallel
+            results = list(tqdm(
+                pool.imap(process_func, image_files),
+                total=len(image_files)
+            ))
 
-        # Map the function to all images in parallel
-        results = list(tqdm(
-            pool.imap(process_func, image_files),
-            total=len(image_files)
-        ))
-
-        # Process results
-        for feature_vector, label_value, error in results:
-            if error:
-                print(error)
-            elif feature_vector is not None:
-                features.append(feature_vector)
-                labels.append(label_value)
-
-    pool.close()
-    pool.join()
+            # Process results
+            for feature_vector, label_value, error in results:
+                if error:
+                    print(error)
+                elif feature_vector is not None:
+                    features.append(feature_vector)
+                    labels.append(label_value)
 
     return np.array(features), np.array(labels)

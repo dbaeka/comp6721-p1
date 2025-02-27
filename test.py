@@ -4,7 +4,7 @@ import numpy as np
 
 from utils.dataset_loader import load_and_preprocess_images
 from utils.evaluation import evaluate_model, compare_models
-from utils.model_inference import load_model, load_feature_scaler
+from utils.model_inference import load_model, load_feature_transform
 
 warnings.filterwarnings('ignore')
 
@@ -21,12 +21,15 @@ if __name__ == "__main__":
     print("Step 1: Loading and preprocessing images...")
 
     # 1. Load the models
-    dt_model = load_model("Decision Tree")
+    dt_model = load_model("Decision Tree 2")
     # rf_model, _ = load_model("Random Forest")
     # gb_model = load_model("Gradient Boosting")
 
     # Load the feature scaler
-    feature_scaler = load_feature_scaler()
+    feature_scaler = load_feature_transform("Feature Scaler 2")
+
+    # Load the PCA transform
+    pca_transform = load_feature_transform("Feature PCA")
 
     # 2. Load and preprocess the test data
     print("Loading and preprocessing test images...")
@@ -36,6 +39,9 @@ if __name__ == "__main__":
     # Apply scaling if the model was trained on scaled data
     if feature_scaler:
         X_test = feature_scaler.transform(X_test)
+
+    if pca_transform:
+        X_test = pca_transform.transform(X_test)
 
     # 3. Make predictions with each model
     print("Making predictions...")
