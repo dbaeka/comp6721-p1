@@ -1,4 +1,8 @@
+import os
+import sys
 import warnings
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
 
@@ -32,7 +36,8 @@ if __name__ == "__main__":
     pca_transform = load_feature_transform("Feature PCA")
 
     print("Loading and preprocessing test images...")
-    testing_dir = 'data/test/'
+    testing_dir = os.path.join('data', 'test')
+    testing_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), testing_dir)
     X_test, y_test = load_and_preprocess_images(testing_dir)
 
     # Apply scaling if the model was trained on scaled data

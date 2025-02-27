@@ -1,4 +1,8 @@
+import os
+import sys
 import warnings
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -23,7 +27,9 @@ if __name__ == "__main__":
 
     print("=== Indoor vs Outdoor Image Classification Training ===\n")
     print("Step 1: Loading and preprocessing images...")
-    training_dir = 'data/train/'
+    training_dir = os.path.join('data', 'train')
+    training_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), training_dir)
+
     X, y = load_and_preprocess_images(training_dir)
 
     print("\nStep 2: Performing exploratory data analysis...")
