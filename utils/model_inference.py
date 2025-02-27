@@ -1,12 +1,18 @@
+import os
+
 import joblib
 
 
 def save_feature_scaler(scaler):
+    os.makedirs('models', exist_ok=True)
+
     joblib.dump(scaler, 'models/feature_scaler.joblib')
     print("Feature scaler successfully saved to the 'models' directory")
 
 
 def save_models(model, name):
+    os.makedirs('models', exist_ok=True)
+
     snake_name = name.replace(" ", "_").lower()
     joblib.dump(model, f'models/{snake_name}.joblib')
 
