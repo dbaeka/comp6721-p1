@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 
@@ -18,10 +18,11 @@ def train_decision_tree(X_train, y_train, X_test, save_plots=False, output_dir=N
 
     # Define parameter grid for hyperparameter tuning
     param_dist = {
-        'max_depth': [None, 5, 10, 15, 20],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
-        'criterion': ['gini', 'entropy']
+        'max_depth': [5, 10, 15, None],  # Limits the depth of the tree to avoid overfitting
+        'min_samples_split': [2, 10, 20],  # Minimum samples required to split an internal node
+        'min_samples_leaf': [1, 5, 10],  # Minimum samples required to be at a leaf node
+        'max_features': [None, 'sqrt', 'log2'],  # Number of features to consider for splits
+        'criterion': ['gini', 'entropy'],
     }
 
     # Convert to float32 to reduce memory usage
@@ -31,18 +32,16 @@ def train_decision_tree(X_train, y_train, X_test, save_plots=False, output_dir=N
     dt = DecisionTreeClassifier(random_state=42)
 
     # Perform grid search with cross-validation
-    rand_search = RandomizedSearchCV(dt, param_distributions=param_dist,
-                                     n_iter=10, cv=5, scoring='accuracy',
-                                     n_jobs=-1, random_state=42)
+    grid_search = GridSearchCV(dt, param_dist, cv=5, scoring='accuracy')
 
-    rand_search.fit(X_train, y_train)
+    grid_search.fit(X_train, y_train)
 
     # Get best parameters and model
-    best_params = rand_search.best_params_
-    best_model = rand_search.best_estimator_
+    best_params = grid_search.best_params_
+    best_model = grid_search.best_estimator_
 
     print("Best parameters:", best_params)
-    print(f"Best cross-validation score: {rand_search.best_score_:.4f}")
+    print(f"Best cross-validation score: {grid_search.best_score_:.4f}")
 
     # Evaluate on test set
     y_pred = best_model.predict(X_test)
@@ -74,8 +73,10 @@ def train_random_forest(X_train, y_train, X_test, save_plots=False, output_dir=N
     param_dist = {
         'n_estimators': [50, 100, 200],
         'max_depth': [None, 10, 20, 30],
-        'min_samples_split': [2, 5, 10],
-        'max_features': ['sqrt', 'log2', None]
+        'min_samples_split': [2, 10, 20],  # Minimum samples required to split an internal node
+        'min_samples_leaf': [1, 5, 10],  # Minimum samples required to be at a leaf node
+        'max_features': ['sqrt', 'log2', None],  # Number of features to consider for splits
+        'criterion': ['gini', 'entropy']  # The function to measure the quality of a split
     }
 
     # Convert to float32 to reduce memory usage
@@ -132,7 +133,7 @@ def train_gradient_boosting(X_train, y_train, X_test, save_plots=False, output_d
     param_dist = {
         'n_estimators': [50, 100, 200],
         'learning_rate': [0.01, 0.1, 0.2],
-        'max_depth': [3, 5, 7],
+        'max_depth': [3, 5, 7, 10],
         'subsample': [0.8, 1.0]
     }
 
