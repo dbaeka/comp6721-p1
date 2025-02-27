@@ -1,54 +1,12 @@
+import multiprocessing as mp
 import os
+from functools import partial
 
 import numpy as np
 from PIL import Image
 from skimage.color import rgb2gray
 from skimage.feature import hog, local_binary_pattern
 from tqdm import tqdm
-
-
-def load_and_preprocess_images(data_dir, target_size=(128, 128), max_images=None):
-    """
-    Load images from directory structure and extract features.
-    """
-    features = []
-    labels = []
-    classes = os.listdir(data_dir)
-
-    # Create a label mapping dictionary
-    label_map = {'indoor': 0, 'outdoor': 1}
-
-    for class_name in classes:
-        if class_name not in label_map:
-            continue
-
-        class_dir = os.path.join(data_dir, class_name)
-        label = label_map[class_name]
-        image_files = os.listdir(class_dir)
-
-        if max_images and len(image_files) > max_images:
-            image_files = np.random.choice(image_files, max_images, replace=False)
-
-        print(f"\nProcessing {len(image_files)} {class_name} images...")
-
-        for img_file in tqdm(image_files):
-            img_path = os.path.join(class_dir, img_file)
-            try:
-                # Load and resize image
-                img = Image.open(img_path)
-                img = img.resize(target_size)
-                img = img.convert('RGB')
-                img_array = np.array(img)
-
-                # Extract features
-                feature_vector = extract_features(img_array)
-
-                features.append(feature_vector)
-                labels.append(label)
-            except Exception as e:
-                print(f"Error processing {img_path}: {e}")
-
-    return np.array(features), np.array(labels)
 
 
 def extract_features(img_array):
@@ -81,3 +39,77 @@ def extract_features(img_array):
         features.append(np.std(img_array[:, :, i]))  # Standard deviation (contrast)
 
     return np.array(features)
+
+
+def process_image(img_file, class_dir, target_size, label):
+    """
+    Process a single image - this function will be used by the parallel workers
+    """
+    img_path = os.path.join(class_dir, img_file)
+    try:
+        # Load and resize image
+        img = Image.open(img_path)
+        img = img.resize(target_size)
+        img = img.convert('RGB')
+        img_array = np.array(img)
+
+        # Extract features
+        feature_vector = extract_features(img_array)
+
+        return feature_vector, label, None
+    except Exception as e:
+        return None, None, f"Error processing {img_path}: {e}"
+
+
+def load_and_preprocess_images(data_dir, target_size=(128, 128), max_images=None, n_jobs=None):
+    """
+    Load images from directory structure and extract features.
+    Uses parallel processing to speed up feature extraction.
+    """
+    if n_jobs is None:
+        # Use all available cores by default
+        n_jobs = mp.cpu_count()
+
+    features = []
+    labels = []
+    classes = os.listdir(data_dir)
+
+    label_map = {'indoor': 0, 'outdoor': 1}
+
+    # Configure a process pool for parallel processing
+    pool = mp.Pool(processes=n_jobs)
+
+    for class_name in classes:
+        if class_name not in label_map:
+            continue
+
+        class_dir = os.path.join(data_dir, class_name)
+        label = label_map[class_name]
+        image_files = os.listdir(class_dir)
+
+        if max_images and len(image_files) > max_images:
+            image_files = np.random.choice(image_files, max_images, replace=False)
+
+        print(f"\nProcessing {len(image_files)} {class_name} images using {n_jobs} processes...")
+
+        # Create a partial function with fixed parameters
+        process_func = partial(process_image, class_dir=class_dir, target_size=target_size, label=label)
+
+        # Map the function to all images in parallel
+        results = list(tqdm(
+            pool.imap(process_func, image_files),
+            total=len(image_files)
+        ))
+
+        # Process results
+        for feature_vector, label_value, error in results:
+            if error:
+                print(error)
+            elif feature_vector is not None:
+                features.append(feature_vector)
+                labels.append(label_value)
+
+    pool.close()
+    pool.join()
+
+    return np.array(features), np.array(labels)
