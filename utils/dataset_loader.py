@@ -55,6 +55,7 @@ def process_image(img_file, class_dir, target_size, label):
         img = img.convert('RGB')
 
         img_array = np.array(img)
+        img_array = img_array.astype(np.float32)
 
         # Extract features
         feature_vector = extract_features(img_array)

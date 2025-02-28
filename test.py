@@ -28,6 +28,7 @@ if __name__ == "__main__":
     dt_model = load_model("Decision Tree")
     rf_model = load_model("Random Forest")
     gb_model = load_model("Gradient Boosting")
+    sm_dt_model = load_model("Semi-Supervised Decision Tree")
 
     # Load the feature scaler
     feature_scaler = load_feature_transform("Feature Scaler")
@@ -51,12 +52,16 @@ if __name__ == "__main__":
     dt_pred = dt_model.predict(X_test)
     rf_pred = rf_model.predict(X_test)
     gb_pred = gb_model.predict(X_test)
+    sm_dt_pred = sm_dt_model.predict(X_test)
 
     # Evaluate each model on the test set
     results = [
         evaluate_model(dt_model, X_test, y_test, dt_pred, "Decision Tree", save_plots=True, output_dir='test_plots'),
         evaluate_model(rf_model, X_test, y_test, rf_pred, "Random Forest", save_plots=True, output_dir='test_plots'),
-        evaluate_model(gb_model, X_test, y_test, gb_pred, "Gradient Boosting", save_plots=True, output_dir='test_plots')
+        evaluate_model(gb_model, X_test, y_test, gb_pred, "Gradient Boosting", save_plots=True,
+                       output_dir='test_plots'),
+        evaluate_model(sm_dt_model, X_test, y_test, sm_dt_pred, "Semi-Supervised Decision Tree", save_plots=True,
+                       output_dir='test_plots')
     ]
 
     metrics_df = compare_models(results, save_plots=True, output_dir='test_plots')

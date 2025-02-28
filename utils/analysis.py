@@ -1,9 +1,11 @@
 import os
+import random
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from PIL import Image
 
 
 def create_class_distribution_plot(df):
@@ -32,21 +34,6 @@ def create_correlation_heatmap(selected_df):
 def explore_data(X, y, feature_names=None, save_plots=False, output_dir=None):
     """
     Perform exploratory data analysis on extracted features with parallel processing
-
-    Parameters:
-    -----------
-    X : array-like
-        Feature matrix
-    y : array-like
-        Target labels
-    feature_names : list, optional
-        Names of features
-    n_jobs : int, optional
-        Number of processes to use (defaults to available CPU cores)
-    save_plots : bool, optional
-        Whether to save plots to disk instead of displaying them
-    output_dir : str, optional
-        Directory to save plots if save_plots is True
     """
     if feature_names is None:
         # Create generic feature names if not provided
@@ -125,3 +112,44 @@ def explore_data(X, y, feature_names=None, save_plots=False, output_dir=None):
     corr_with_target = important_df.corr()['class'].sort_values(ascending=False)
     print("\nTop 10 features correlated with target:")
     print(corr_with_target[:10])
+
+
+def visualize_data(training_dir, n_samples=5, save_plots=False, output_dir=None):
+    # Create output directory if saving plots
+    if save_plots and output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
+    plt.figure(figsize=(15, 8))
+
+    # Get outdoor images
+    outdoor_dir = os.path.join(training_dir, 'outdoor')
+    outdoor_files = [os.path.join(outdoor_dir, f) for f in os.listdir(outdoor_dir)
+                     if os.path.isfile(os.path.join(outdoor_dir, f))]
+    outdoor_samples = random.sample(outdoor_files, n_samples)
+
+    # Get indoor images
+    indoor_dir = os.path.join(training_dir, 'indoor')
+    indoor_files = [os.path.join(indoor_dir, f) for f in os.listdir(indoor_dir)
+                    if os.path.isfile(os.path.join(indoor_dir, f))]
+    indoor_samples = random.sample(indoor_files, n_samples)
+
+    for i, img_path in enumerate(outdoor_samples):
+        img = Image.open(img_path).convert('L')  # Convert to grayscale
+        plt.subplot(2, n_samples, i + 1)
+        plt.imshow(img, cmap='gray')
+        plt.title(f"Outdoor {i + 1}")
+        plt.axis('off')
+
+    for i, img_path in enumerate(indoor_samples):
+        img = Image.open(img_path).convert('L')  # Convert to grayscale
+        plt.subplot(2, n_samples, i + n_samples + 1)
+        plt.imshow(img, cmap='gray')
+        plt.title(f"Indoor {i + 1}")
+        plt.axis('off')
+
+    if save_plots:
+        plt.savefig(os.path.join(output_dir, 'sample_images.png'))
+        plt.close()
+    else:
+        plt.tight_layout()
+        plt.show()
