@@ -9,7 +9,20 @@ machine learning algorithms:
 
 ## Dataset
 The dataset consists of images of museum artifacts. The dataset is divided into two categories: indoor and outdoor. The dataset is divided into two folders: indoor and outdoor. The indoor folder contains images of museum artifacts that are indoors, while the outdoor folder contains images of museum artifacts that are outdoors.
-The dataset can be downloaded from the following link [Museum Dataset](https://drive.google.com/file/d/1Z9Q6Z6Q1Q1J9)
+The dataset can be downloaded from the following link [Museum Dataset](https://drive.google.com/drive/folders/1bDGTc0drcpUKslyM6nB9u1XSl1HF7RmP?usp=drive_link). Place the dataset in the `data` folder.
+with the following structure:
+```
+data
+- train
+  - indoor
+    - image1.jpg
+    - image2.jpg
+    - ...
+  - outdoor
+    - image1.jpg
+    - image2.jpg
+    - ...
+```
 
 ## Requirements
 - Python 3.12.2
@@ -17,7 +30,7 @@ The dataset can be downloaded from the following link [Museum Dataset](https://d
 ## Installation
 1. Clone the repository
 ```bash
-git clone
+git clone git@github.com:dbaeka/comp6721-p1.git
 ```
 2. Install the required libraries
 ```bash
@@ -27,7 +40,7 @@ pip install -r requirements.txt
 ## Usage
 1. Navigate to the project directory
 ```bash
-cd Phase 1
+cd comp6721-p1
 ```
 2. Run the following command to train the model
 ```bash
