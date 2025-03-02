@@ -1,0 +1,97 @@
+/Users/dbaeka/miniconda3/bin/python /Users/dbaeka/Documents/School/CU/Winter 2025/COMP6721 Applied AI/Research/Phase 1/test.py
+------------------Group Members------------------------
+Delmwin Baeka (40277017)
+Lordina Nkansah (40293731)
+Anjolaoluwa Lasekan (40294470)
+=== Indoor vs Outdoor Image Classification Testing ===
+
+Step 1: Loading and preprocessing images...
+Loading and preprocessing test images...
+
+Processing 100 indoor images using 12 processes...
+100%|██████████| 100/100 [00:01<00:00, 51.75it/s]
+  0%|          | 0/100 [00:00<?, ?it/s]
+Processing 100 outdoor images using 12 processes...
+100%|██████████| 100/100 [00:00<00:00, 2258.62it/s]
+Making predictions...
+
+--- Decision Tree Evaluation Metrics ---
+Accuracy: 0.8250
+Precision: 0.8351
+Recall: 0.8100
+F1 Score: 0.8223
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Indoor       0.82      0.84      0.83       100
+     Outdoor       0.84      0.81      0.82       100
+
+    accuracy                           0.82       200
+   macro avg       0.83      0.82      0.82       200
+weighted avg       0.83      0.82      0.82       200
+
+
+--- Random Forest Evaluation Metrics ---
+Accuracy: 0.8600
+Precision: 0.8830
+Recall: 0.8300
+F1 Score: 0.8557
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Indoor       0.84      0.89      0.86       100
+     Outdoor       0.88      0.83      0.86       100
+
+    accuracy                           0.86       200
+   macro avg       0.86      0.86      0.86       200
+weighted avg       0.86      0.86      0.86       200
+
+
+--- Gradient Boosting Evaluation Metrics ---
+Accuracy: 0.8650
+Precision: 0.8614
+Recall: 0.8700
+F1 Score: 0.8657
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Indoor       0.87      0.86      0.86       100
+     Outdoor       0.86      0.87      0.87       100
+
+    accuracy                           0.86       200
+   macro avg       0.87      0.86      0.86       200
+weighted avg       0.87      0.86      0.86       200
+
+
+--- Semi-Supervised Decision Tree Evaluation Metrics ---
+Accuracy: 0.6950
+Precision: 0.7143
+Recall: 0.6500
+F1 Score: 0.6806
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Indoor       0.68      0.74      0.71       100
+     Outdoor       0.71      0.65      0.68       100
+
+    accuracy                           0.69       200
+   macro avg       0.70      0.70      0.69       200
+weighted avg       0.70      0.69      0.69       200
+
+
+=== Model Performance Summary ===
+                               Accuracy  Precision  Recall  F1 Score
+Decision Tree                     0.825   0.835052    0.81  0.822335
+Random Forest                     0.860   0.882979    0.83  0.855670
+Gradient Boosting                 0.865   0.861386    0.87  0.865672
+Semi-Supervised Decision Tree     0.695   0.714286    0.65  0.680628
+
+Best model based on F1 score: Gradient Boosting
+
+=== Classification Project Complete ===
+
+Process finished with exit code 0
